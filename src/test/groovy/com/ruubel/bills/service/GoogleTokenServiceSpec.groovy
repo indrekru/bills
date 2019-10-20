@@ -24,13 +24,6 @@ class GoogleTokenServiceSpec extends Specification {
         service = new GoogleTokenService(repository, nonceRepository, httpService)
     }
 
-    def "when, then fail" () {
-        when:
-            true
-        then:
-            false
-    }
-
     def "when invalid code, then returns null" () {
         given:
             User user = new User()
