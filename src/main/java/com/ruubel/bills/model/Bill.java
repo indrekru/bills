@@ -3,11 +3,12 @@ package com.ruubel.bills.model;
 import com.ruubel.bills.converter.TimestampConverter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
 @Table(name = "bill")
-public class Bill {
+public class Bill implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
