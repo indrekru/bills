@@ -3,13 +3,14 @@ package com.ruubel.bills.model;
 import com.ruubel.bills.converter.TimestampConverter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Entity
 @Table(name = "google_token")
-public class GoogleToken {
+public class GoogleToken implements Serializable {
 
     @Id
     @GeneratedValue
