@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 import static com.ruubel.bills.service.UserService.ROLE_USER;
 
@@ -33,6 +35,8 @@ public class User implements UserDetails {
     @Column(name = "active")
     private boolean active;
 
+    @OneToMany(mappedBy = "user")
+    private List<Property> properties;
 
     @Column(name = "created_at")
     @Convert(converter = TimestampConverter.class)
