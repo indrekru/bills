@@ -64,6 +64,8 @@ public class ReadGmailJob {
                 log.info("Fetching mail..");
 
                 List<Message> messages = gmailService.getLast100Messages(googleToken);
+                List<Property> properties = propertyService.findAllByUser(user);
+
                 for (Message message : messages) {
                     String messageId = message.getId();
                     message = gmailService.getMessage(googleToken, messageId); //service.users().messages().get(user, messageId).execute();
@@ -76,13 +78,11 @@ public class ReadGmailJob {
                     if (optionalFromHeader.isPresent()) {
                         MessagePartHeader fromHeader = optionalFromHeader.get();
                         String senderEmail = fromHeader.getValue();
-                        log.info("Email: {}", senderEmail);
-                        List<Property> properties = propertyService.findAllByUser(user);
                         for (Property property : properties) {
                             List<Bill> bills = billService.findAllByProperty(property);
                             for (Bill bill : bills) {
                                 String targetSenderEmail = bill.getSenderEmail();
-                                if (senderEmail.equals(targetSenderEmail)) {
+                                if (senderEmail.contains(targetSenderEmail)) {
                                     log.info("Found email from sender: {}", targetSenderEmail);
                                 }
                             }
