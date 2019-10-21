@@ -49,8 +49,8 @@ public class ReadGmailJob {
         this.billService = billService;
     }
 
-    @Scheduled(cron = "0 0/5 * * * ?") // Every 5 minutes
-//    @Scheduled(cron = "0 0 0/12 * * ?") // Every 12 hours
+//    @Scheduled(cron = "0 0/5 * * * ?") // Every 5 minutes
+    @Scheduled(cron = "0 0 0/12 * * ?") // Every 12 hours
     public void run() throws Exception {
 
         log.info("Running mail-read job");
