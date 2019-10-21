@@ -70,7 +70,7 @@ public class ReadGmailJob {
 
                 for (Message message : messages) {
                     String messageId = message.getId();
-                    message = gmailService.getMessage(googleToken, messageId); //service.users().messages().get(user, messageId).execute();
+                    message = gmailService.getMessage(googleToken, messageId);
                     MessagePart payload = message.getPayload();
                     List<MessagePartHeader> headers = payload.getHeaders();
                     Optional<MessagePartHeader> optionalFromHeader = headers
@@ -101,9 +101,7 @@ public class ReadGmailJob {
         } else {
             log.error("No user found : {}", ADMIN_USER_EMAIL);
         }
-
         log.info("Done running mail-read job");
-
     }
 
 }

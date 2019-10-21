@@ -22,6 +22,7 @@ public class GmailService {
     private JsonFactory JSON_FACTORY;
     private NetHttpTransport HTTP_TRANSPORT;
     private String APPLICATION_NAME = "Gmail read API";
+    private String USER = "me";
 
     @Value("${google.app.client.id}")
     private String CLIENT_ID;
@@ -30,8 +31,6 @@ public class GmailService {
     private String CLIENT_SECRET;
 
     private PDFExtractorService pdfExtractorService;
-
-    private String user = "me";
 
     @Autowired
     public GmailService(PDFExtractorService pdfExtractorService) throws Exception {
@@ -65,50 +64,13 @@ public class GmailService {
 
     public Message getMessage(GoogleToken googleToken, String messageId) throws Exception {
         Gmail service = createService(googleToken);
-        return service.users().messages().get(user, messageId).execute();
+        return service.users().messages().get(USER, messageId).execute();
     }
 
     public List<Message> getLast100Messages(GoogleToken googleToken) throws Exception {
         Gmail service = createService(googleToken);
-
-        ListMessagesResponse messagesResponse = service.users().messages().list(user).execute();
+        ListMessagesResponse messagesResponse = service.users().messages().list(USER).execute();
         return messagesResponse.getMessages();
-    }
-
-    public String readGmail(GoogleToken googleToken) throws Exception {
-
-        String out = "";
-
-        NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Credential credential = convertToGoogleCredential(googleToken);
-        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
-
-        // Gets last 100 messages
-        ListMessagesResponse messagesResponse = service.users().messages().list(user).execute();
-        List<Message> messages = messagesResponse.getMessages();
-        for (Message message : messages) {
-            String messageId = message.getId();
-            message = service.users().messages().get(user, messageId).execute();
-            MessagePart payload = message.getPayload();
-            List<MessagePartHeader> headers = payload.getHeaders();
-            for (MessagePartHeader header : headers) {
-                String headerName = header.getName();
-                if (headerName.equals("From")) {
-                    String from = header.getValue();
-                    if (from.equals("hbimre <imre@heiberg.ee>")) {
-                        BillType billType = BillType.KU_TATARI_60;
-                        Double toPay = getToPay(messageId, payload, billType, service);
-                        out += String.format("|%s = %s", billType, toPay);
-                    } else if (from.equals("Imatra Elekter <klienditeenindus@imatraelekter.ee>")) {
-                        BillType billType = BillType.IMATRA;
-                        Double toPay = getToPay(messageId, payload, billType, service);
-                        out += String.format("|%s = %s", billType, toPay);
-                    }
-                }
-            }
-        }
-
-        return out;
     }
 
     public Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
@@ -119,7 +81,7 @@ public class GmailService {
             if (!filename.isEmpty()) {
                 MessagePartBody body = part.getBody();
                 String attachmentId = body.getAttachmentId();
-                body = service.users().messages().attachments().get(user, messageId, attachmentId).execute();
+                body = service.users().messages().attachments().get(USER, messageId, attachmentId).execute();
                 byte[] bytes = body.decodeData();
                 List<Double> prices = pdfExtractorService.extractAmounts(billType, bytes);
                 out = billType.getBillMath().doTheMath(prices);
