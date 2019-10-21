@@ -41,7 +41,11 @@ public class GmailService {
     }
 
     private Credential convertToGoogleCredential(String accessToken, String refreshToken, String clientId, String clientSecret) {
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(clientId, clientSecret).build();
+        GoogleCredential credential = new GoogleCredential.Builder()
+                .setTransport(HTTP_TRANSPORT)
+                .setJsonFactory(JSON_FACTORY)
+                .setClientSecrets(clientId, clientSecret)
+                .build();
         credential.setAccessToken(accessToken);
         credential.setRefreshToken(refreshToken);
         try {

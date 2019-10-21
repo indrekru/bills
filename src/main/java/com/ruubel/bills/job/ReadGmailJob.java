@@ -81,7 +81,7 @@ public class ReadGmailJob {
                             List<Bill> bills = billService.findAllByProperty(property);
                             for (Bill bill : bills) {
                                 String targetSenderEmail = bill.getSenderEmail();
-                                if (targetSenderEmail.equals(senderEmail)) {
+                                if (senderEmail.contains(targetSenderEmail)) {
                                     log.info("Found email from sender: {}", targetSenderEmail);
                                 }
                             }
