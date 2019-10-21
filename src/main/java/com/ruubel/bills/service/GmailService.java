@@ -3,7 +3,6 @@ package com.ruubel.bills.service;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -57,21 +56,20 @@ public class GmailService {
         return credential;
     }
 
-    private Gmail createService(Credential credential) {
+    public Gmail createService(GoogleToken googleToken) {
+        Credential credential = convertToGoogleCredential(googleToken);
         return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
             .setApplicationName(APPLICATION_NAME)
             .build();
     }
 
     public Message getMessage(GoogleToken googleToken, String messageId) throws Exception {
-        Credential credential = convertToGoogleCredential(googleToken);
-        Gmail service = createService(credential);
+        Gmail service = createService(googleToken);
         return service.users().messages().get(user, messageId).execute();
     }
 
     public List<Message> getLast100Messages(GoogleToken googleToken) throws Exception {
-        Credential credential = convertToGoogleCredential(googleToken);
-        Gmail service = createService(credential);
+        Gmail service = createService(googleToken);
 
         ListMessagesResponse messagesResponse = service.users().messages().list(user).execute();
         return messagesResponse.getMessages();
@@ -113,7 +111,7 @@ public class GmailService {
         return out;
     }
 
-    private Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
+    public Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
         List<MessagePart> parts = payload.getParts();
         Double out = null;
         for (MessagePart part : parts) {

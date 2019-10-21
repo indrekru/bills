@@ -49,7 +49,7 @@ public class ReadGmailJob {
         this.billService = billService;
     }
 
-    @Scheduled(cron = "0 0/1 * * * ?") // Every 5 minutes
+    @Scheduled(cron = "0 0/5 * * * ?") // Every 5 minutes
 //    @Scheduled(cron = "0 0 0/12 * * ?") // Every 12 hours
     public void run() throws Exception {
 
@@ -62,6 +62,8 @@ public class ReadGmailJob {
             GoogleToken googleToken = googleTokenService.getValidToken(user);
             if (googleToken != null) {
                 log.info("Fetching mail..");
+
+                String out = "";
 
                 List<Message> messages = gmailService.getLast100Messages(googleToken);
                 List<Property> properties = propertyService.findAllByUser(user);
@@ -84,14 +86,15 @@ public class ReadGmailJob {
                                 String targetSenderEmail = bill.getSenderEmail();
                                 if (senderEmail.contains(targetSenderEmail)) {
                                     log.info("Found email from sender: {}", targetSenderEmail);
+                                    BillType billType = bill.getBillType();
+                                    Double toPay = gmailService.getToPay(messageId, payload, billType, gmailService.createService(googleToken));
+                                    out += String.format("|%s = %s", billType, toPay);
                                 }
                             }
                         }
                     }
                 }
-
-//                String readGmailResult = gmailService.readGmail(googleToken);
-//                mailingService.notifyMailRead(readGmailResult);
+                mailingService.notifyMailRead(out);
             } else {
                 log.error("Couldn't get a valid google token, investigate...");
             }
