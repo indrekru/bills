@@ -38,4 +38,24 @@ public class Property implements Serializable {
         this.user = user;
         this.createdAt = Instant.now();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public List<Bill> getBills() {
+        return bills;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }
