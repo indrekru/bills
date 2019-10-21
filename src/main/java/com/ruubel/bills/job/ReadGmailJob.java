@@ -1,5 +1,8 @@
 package com.ruubel.bills.job;
 
+import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
+import com.google.api.services.gmail.model.MessagePartHeader;
 import com.ruubel.bills.model.Bill;
 import com.ruubel.bills.model.GoogleToken;
 import com.ruubel.bills.model.Property;
@@ -60,14 +63,30 @@ public class ReadGmailJob {
             if (googleToken != null) {
                 log.info("Fetching mail..");
 
-                List<Property> properties = propertyService.findAllByUser(user);
-                for (Property property : properties) {
-                    log.info("Property: " + property.getName());
-                    List<Bill> bills = billService.findAllByProperty(property);
-                    for (Bill bill : bills) {
-                        log.info(bill.getSenderEmail() + ": " + bill.getName());
+                List<Message> messages = gmailService.getLast100Messages(googleToken);
+                for (Message message : messages) {
+                    String messageId = message.getId();
+                    message = gmailService.getMessage(googleToken, messageId); //service.users().messages().get(user, messageId).execute();
+                    MessagePart payload = message.getPayload();
+                    List<MessagePartHeader> headers = payload.getHeaders();
+                    Optional<MessagePartHeader> optionalFromHeader = headers
+                        .stream()
+                        .filter(header -> header.getName().equals("From"))
+                        .findFirst();
+                    if (optionalFromHeader.isPresent()) {
+                        MessagePartHeader fromHeader = optionalFromHeader.get();
+                        String senderEmail = fromHeader.getValue();
+                        List<Property> properties = propertyService.findAllByUser(user);
+                        for (Property property : properties) {
+                            List<Bill> bills = billService.findAllByProperty(property);
+                            for (Bill bill : bills) {
+                                String targetSenderEmail = bill.getSenderEmail();
+                                if (targetSenderEmail.equals(senderEmail)) {
+                                    log.info("Found email from sender: {}", targetSenderEmail);
+                                }
+                            }
+                        }
                     }
-
                 }
 
 //                String readGmailResult = gmailService.readGmail(googleToken);

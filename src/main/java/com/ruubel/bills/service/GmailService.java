@@ -20,7 +20,8 @@ import java.util.List;
 @Service
 public class GmailService {
 
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private JsonFactory JSON_FACTORY;
+    private NetHttpTransport HTTP_TRANSPORT;
 
     @Value("${google.app.client.id}")
     private String CLIENT_ID;
@@ -28,14 +29,19 @@ public class GmailService {
     @Value("${google.app.client.secret}")
     private String CLIENT_SECRET;
 
-    @Autowired
     private PDFExtractorService pdfExtractorService;
 
-    private Gmail service;
     private String user = "me";
 
-    private static Credential convertToGoogleCredential(HttpTransport httpTransport, JsonFactory jsonFactory, String accessToken, String refreshToken, String clientId,String clientSecret) {
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(jsonFactory).setClientSecrets(clientId, clientSecret).build();
+    @Autowired
+    public GmailService(PDFExtractorService pdfExtractorService) throws Exception {
+        this.pdfExtractorService = pdfExtractorService;
+        this.JSON_FACTORY = JacksonFactory.getDefaultInstance();
+        this.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    }
+
+    private Credential convertToGoogleCredential(String accessToken, String refreshToken, String clientId, String clientSecret) {
+        GoogleCredential credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(clientId, clientSecret).build();
         credential.setAccessToken(accessToken);
         credential.setRefreshToken(refreshToken);
         try {
@@ -46,13 +52,36 @@ public class GmailService {
         return credential;
     }
 
+    public Message getMessage(GoogleToken googleToken, String messageId) throws Exception {
+        Credential credential = convertToGoogleCredential(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
+        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+        return service.users().messages().get(user, messageId).execute();
+    }
+
+    public List<Message> getLast100Messages(GoogleToken googleToken) throws Exception {
+        return getLast100Messages(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
+    }
+
+    public List<Message> getLast100Messages(String accessToken, String refreshToken, String clientId, String clientSecret) throws Exception {
+
+        Credential credential = convertToGoogleCredential(accessToken, refreshToken, clientId, clientSecret);
+        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+
+        ListMessagesResponse messagesResponse = service.users().messages().list(user).execute();
+        return messagesResponse.getMessages();
+    }
+
+    public String readGmail(GoogleToken googleToken) throws Exception {
+        return readGmail(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
+    }
+
     public String readGmail(String accessToken, String refreshToken, String clientId, String clientSecret) throws Exception {
 
         String out = "";
 
         NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Credential credential = convertToGoogleCredential(HTTP_TRANSPORT, JSON_FACTORY, accessToken, refreshToken, clientId, clientSecret);
-        service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+        Credential credential = convertToGoogleCredential(accessToken, refreshToken, clientId, clientSecret);
+        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
 
         // Gets last 100 messages
         ListMessagesResponse messagesResponse = service.users().messages().list(user).execute();
@@ -68,11 +97,11 @@ public class GmailService {
                     String from = header.getValue();
                     if (from.equals("hbimre <imre@heiberg.ee>")) {
                         BillType billType = BillType.KU_TATARI_60;
-                        Double toPay = getToPay(messageId, payload, billType);
+                        Double toPay = getToPay(messageId, payload, billType, service);
                         out += String.format("|%s = %s", billType, toPay);
                     } else if (from.equals("Imatra Elekter <klienditeenindus@imatraelekter.ee>")) {
                         BillType billType = BillType.IMATRA;
-                        Double toPay = getToPay(messageId, payload, billType);
+                        Double toPay = getToPay(messageId, payload, billType, service);
                         out += String.format("|%s = %s", billType, toPay);
                     }
                 }
@@ -82,7 +111,7 @@ public class GmailService {
         return out;
     }
 
-    private Double getToPay(String messageId, MessagePart payload, BillType billType) throws Exception {
+    private Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
         List<MessagePart> parts = payload.getParts();
         Double out = null;
         for (MessagePart part : parts) {
@@ -97,9 +126,5 @@ public class GmailService {
             }
         }
         return out;
-    }
-
-    public String readGmail(GoogleToken googleToken) throws Exception {
-        return readGmail(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
     }
 }
