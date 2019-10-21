@@ -41,14 +41,14 @@ public class GmailService {
         this.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     }
 
-    private Credential convertToGoogleCredential(String accessToken, String refreshToken, String clientId, String clientSecret) {
+    private Credential convertToGoogleCredential(GoogleToken googleToken) {
         GoogleCredential credential = new GoogleCredential.Builder()
-                .setTransport(HTTP_TRANSPORT)
-                .setJsonFactory(JSON_FACTORY)
-                .setClientSecrets(clientId, clientSecret)
-                .build();
-        credential.setAccessToken(accessToken);
-        credential.setRefreshToken(refreshToken);
+            .setTransport(HTTP_TRANSPORT)
+            .setJsonFactory(JSON_FACTORY)
+            .setClientSecrets(CLIENT_ID, CLIENT_SECRET)
+            .build();
+        credential.setAccessToken(googleToken.getAccessToken());
+        credential.setRefreshToken(googleToken.getRefreshToken());
         try {
             credential.refreshToken();
         } catch (IOException e) {
@@ -57,37 +57,32 @@ public class GmailService {
         return credential;
     }
 
-    public Message getMessage(GoogleToken googleToken, String messageId) throws Exception {
-        Credential credential = convertToGoogleCredential(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
-        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+    private Gmail createService(Credential credential) {
+        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
             .setApplicationName(APPLICATION_NAME)
             .build();
+    }
+
+    public Message getMessage(GoogleToken googleToken, String messageId) throws Exception {
+        Credential credential = convertToGoogleCredential(googleToken);
+        Gmail service = createService(credential);
         return service.users().messages().get(user, messageId).execute();
     }
 
     public List<Message> getLast100Messages(GoogleToken googleToken) throws Exception {
-        return getLast100Messages(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
-    }
-
-    public List<Message> getLast100Messages(String accessToken, String refreshToken, String clientId, String clientSecret) throws Exception {
-
-        Credential credential = convertToGoogleCredential(accessToken, refreshToken, clientId, clientSecret);
-        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+        Credential credential = convertToGoogleCredential(googleToken);
+        Gmail service = createService(credential);
 
         ListMessagesResponse messagesResponse = service.users().messages().list(user).execute();
         return messagesResponse.getMessages();
     }
 
     public String readGmail(GoogleToken googleToken) throws Exception {
-        return readGmail(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
-    }
-
-    public String readGmail(String accessToken, String refreshToken, String clientId, String clientSecret) throws Exception {
 
         String out = "";
 
         NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Credential credential = convertToGoogleCredential(accessToken, refreshToken, clientId, clientSecret);
+        Credential credential = convertToGoogleCredential(googleToken);
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
 
         // Gets last 100 messages

@@ -76,6 +76,7 @@ public class ReadGmailJob {
                     if (optionalFromHeader.isPresent()) {
                         MessagePartHeader fromHeader = optionalFromHeader.get();
                         String senderEmail = fromHeader.getValue();
+                        log.info("Email: {}", senderEmail);
                         List<Property> properties = propertyService.findAllByUser(user);
                         for (Property property : properties) {
                             List<Bill> bills = billService.findAllByProperty(property);
