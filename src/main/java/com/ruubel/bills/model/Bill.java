@@ -1,6 +1,7 @@
 package com.ruubel.bills.model;
 
 import com.ruubel.bills.converter.TimestampConverter;
+import com.ruubel.bills.service.BillType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,6 +22,10 @@ public class Bill implements Serializable {
     @Column(name = "sender_email")
     private String senderEmail;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bill_type")
+    private BillType billType;
+
     @ManyToOne
     @JoinColumn(name = "property")
     private Property property;
@@ -32,9 +37,10 @@ public class Bill implements Serializable {
     public Bill() {
     }
 
-    public Bill(String name, String senderEmail, Property property) {
+    public Bill(String name, String senderEmail, BillType billType, Property property) {
         this.name = name;
         this.senderEmail = senderEmail;
+        this.billType = billType;
         this.property = property;
         this.createdAt = Instant.now();
     }
@@ -49,6 +55,10 @@ public class Bill implements Serializable {
 
     public String getSenderEmail() {
         return senderEmail;
+    }
+
+    public BillType getBillType() {
+        return billType;
     }
 
     public Property getProperty() {
