@@ -22,6 +22,7 @@ public class GmailService {
 
     private JsonFactory JSON_FACTORY;
     private NetHttpTransport HTTP_TRANSPORT;
+    private String APPLICATION_NAME = "Gmail read API";
 
     @Value("${google.app.client.id}")
     private String CLIENT_ID;
@@ -41,7 +42,11 @@ public class GmailService {
     }
 
     private Credential convertToGoogleCredential(String accessToken, String refreshToken, String clientId, String clientSecret) {
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(clientId, clientSecret).build();
+        GoogleCredential credential = new GoogleCredential.Builder()
+                .setTransport(HTTP_TRANSPORT)
+                .setJsonFactory(JSON_FACTORY)
+                .setClientSecrets(clientId, clientSecret)
+                .build();
         credential.setAccessToken(accessToken);
         credential.setRefreshToken(refreshToken);
         try {
@@ -54,7 +59,9 @@ public class GmailService {
 
     public Message getMessage(GoogleToken googleToken, String messageId) throws Exception {
         Credential credential = convertToGoogleCredential(googleToken.getAccessToken(), googleToken.getRefreshToken(), CLIENT_ID, CLIENT_SECRET);
-        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+            .setApplicationName(APPLICATION_NAME)
+            .build();
         return service.users().messages().get(user, messageId).execute();
     }
 
