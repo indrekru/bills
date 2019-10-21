@@ -38,4 +38,24 @@ public class Bill implements Serializable {
         this.property = property;
         this.createdAt = Instant.now();
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public Property getProperty() {
+        return property;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }
