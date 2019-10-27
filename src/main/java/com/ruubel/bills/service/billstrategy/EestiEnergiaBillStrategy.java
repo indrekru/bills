@@ -40,8 +40,8 @@ public class EestiEnergiaBillStrategy implements BillStrategy {
 
     private Double getToPay(String messageId, MessagePart payload, Gmail service) throws Exception {
 
-        Map<String, Integer> rows = new HashMap<String, Integer>() {{
-            put("Kuulub tasumisele:", 1);
+        List<String> lines = new ArrayList<String>() {{
+            add("Kuulub tasumisele");
         }};
 
 
@@ -54,14 +54,14 @@ public class EestiEnergiaBillStrategy implements BillStrategy {
                 String attachmentId = body.getAttachmentId();
                 body = service.users().messages().attachments().get(USER, messageId, attachmentId).execute();
                 byte[] bytes = body.decodeData();
-                List<Double> prices = extractAmounts(rows, bytes);
+                List<Double> prices = extractAmounts(lines, bytes);
                 return prices.get(0);
             }
         }
         return out;
     }
 
-    private List<Double> extractAmounts(Map<String, Integer> config, byte[] bytes) {
+    private List<Double> extractAmounts(List<String> lines, byte[] bytes) {
         List<Double> out = new ArrayList<>();
         try {
             PDDocument document = PDDocument.load(bytes);
@@ -76,15 +76,15 @@ public class EestiEnergiaBillStrategy implements BillStrategy {
                 String pdfFileInText = tStripper.getText(document);
 
                 // split by whitespace
-                String lines[] = pdfFileInText.split("\\r?\\n");
-                for (String line : lines) {
-                    line = line.trim();
-                    for (String key : config.keySet()) {
-                        if (line.contains(key)) {
-                            String[] parts = line.split(" ");
-                            String target = parts[config.get(key)];
-                            target = target.replaceAll("[^\\d.]", "");
-                            Double extractedPrice = Double.parseDouble(target);
+                String foundLines[] = pdfFileInText.split("\\r?\\n");
+                for (String foundLine : foundLines) {
+                    foundLine = foundLine.trim();
+                    for (String line : lines) {
+                        if (foundLine.contains(line)) {
+                            //String[] parts = line.split(" ");
+                            //String target = parts[config.get(key)];
+                            foundLine = foundLine.replaceAll("[^\\d.]", "");
+                            Double extractedPrice = Double.parseDouble(foundLine);
                             out.add(extractedPrice);
                         }
                     }
