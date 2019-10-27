@@ -1,32 +1,27 @@
 package com.ruubel.bills.service;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Message;
+import com.ruubel.bills.model.Bill;
+import com.ruubel.bills.service.billstrategy.BillStrategy;
+import com.ruubel.bills.service.billstrategy.Tatari60BillStrategy;
 
 public enum BillType {
-    KU_TATARI_60(new HashMap<String, Integer>() {{
-        put("Remondikulud", 1);
-        put("Kokku:", 1);
-    }}, prices -> prices.get(1) - prices.get(0)),
-    IMATRA(new HashMap<String, Integer>() {{
-        put("ARVE KOKKU €", 2);
-    }}, prices -> {
-        return prices.get(0);
-    });
 
-    private Map<String, Integer> config;
-    private BillMath billMath;
+    KU_TATARI_60(new Tatari60BillStrategy());
 
-    BillType(Map<String, Integer> config, BillMath billMath) {
-        this.config = config;
-        this.billMath = billMath;
+    private BillStrategy strategy;
+
+    BillType(BillStrategy strategy) {
+        this.strategy = strategy;
     }
 
-    public Map<String, Integer> getConfig() {
-        return config;
-    }
-
-    public BillMath getBillMath() {
-        return billMath;
+    public Double getToPay(Bill bill, Message message, Gmail gmail) {
+        try {
+            return strategy.getToPay(bill, message, gmail);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

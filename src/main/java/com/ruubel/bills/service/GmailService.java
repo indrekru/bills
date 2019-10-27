@@ -22,7 +22,7 @@ public class GmailService {
     private JsonFactory JSON_FACTORY;
     private NetHttpTransport HTTP_TRANSPORT;
     private String APPLICATION_NAME = "Gmail read API";
-    private String USER = "me";
+    public final static String USER = "me";
 
     @Value("${google.app.client.id}")
     private String CLIENT_ID;
@@ -67,26 +67,25 @@ public class GmailService {
         return service.users().messages().get(USER, messageId).execute();
     }
 
-    public List<Message> getLast100Messages(GoogleToken googleToken) throws Exception {
-        Gmail service = createService(googleToken);
+    public List<Message> getLast100Messages(Gmail service) throws Exception {
         ListMessagesResponse messagesResponse = service.users().messages().list(USER).execute();
         return messagesResponse.getMessages();
     }
 
-    public Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
-        List<MessagePart> parts = payload.getParts();
-        Double out = null;
-        for (MessagePart part : parts) {
-            String filename = part.getFilename().trim();
-            if (!filename.isEmpty()) {
-                MessagePartBody body = part.getBody();
-                String attachmentId = body.getAttachmentId();
-                body = service.users().messages().attachments().get(USER, messageId, attachmentId).execute();
-                byte[] bytes = body.decodeData();
-                List<Double> prices = pdfExtractorService.extractAmounts(billType, bytes);
-                out = billType.getBillMath().doTheMath(prices);
-            }
-        }
-        return out;
-    }
+//    public Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
+//        List<MessagePart> parts = payload.getParts();
+//        Double out = null;
+//        for (MessagePart part : parts) {
+//            String filename = part.getFilename().trim();
+//            if (!filename.isEmpty()) {
+//                MessagePartBody body = part.getBody();
+//                String attachmentId = body.getAttachmentId();
+//                body = service.users().messages().attachments().get(USER, messageId, attachmentId).execute();
+//                byte[] bytes = body.decodeData();
+//                List<Double> prices = pdfExtractorService.extractAmounts(billType, bytes);
+//                out = billType.getBillMath().doTheMath(prices);
+//            }
+//        }
+//        return out;
+//    }
 }
