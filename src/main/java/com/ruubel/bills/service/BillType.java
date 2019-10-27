@@ -4,11 +4,13 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.ruubel.bills.model.Bill;
 import com.ruubel.bills.service.billstrategy.BillStrategy;
+import com.ruubel.bills.service.billstrategy.EestiEnergiaBillStrategy;
 import com.ruubel.bills.service.billstrategy.Tatari60BillStrategy;
 
 public enum BillType {
 
-    KU_TATARI_60(new Tatari60BillStrategy());
+    KU_TATARI_60(new Tatari60BillStrategy()),
+    EESTI_ENERGIA(new EestiEnergiaBillStrategy());
 
     private BillStrategy strategy;
 
