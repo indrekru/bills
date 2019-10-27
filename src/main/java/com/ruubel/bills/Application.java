@@ -2,7 +2,6 @@ package com.ruubel.bills;
 
 import com.ruubel.bills.job.ReadGmailJob;
 import com.ruubel.bills.service.GmailService;
-import com.ruubel.bills.service.PDFExtractorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,8 +12,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
-	@Autowired
-	private PDFExtractorService pdfExtractorService;
 
 	@Autowired
 	private GmailService gmailService;
