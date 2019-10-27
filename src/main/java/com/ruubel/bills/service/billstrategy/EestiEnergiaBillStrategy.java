@@ -81,8 +81,7 @@ public class EestiEnergiaBillStrategy implements BillStrategy {
                     foundLine = foundLine.trim();
                     for (String line : lines) {
                         if (foundLine.contains(line)) {
-                            //String[] parts = line.split(" ");
-                            //String target = parts[config.get(key)];
+                            foundLine = foundLine.replace(",", ".");
                             foundLine = foundLine.replaceAll("[^\\d.]", "");
                             Double extractedPrice = Double.parseDouble(foundLine);
                             out.add(extractedPrice);
