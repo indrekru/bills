@@ -1,19 +1,13 @@
 package com.ruubel.bills;
 
-import com.ruubel.bills.service.BillType;
+import com.ruubel.bills.job.ReadGmailJob;
 import com.ruubel.bills.service.GmailService;
 import com.ruubel.bills.service.PDFExtractorService;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.io.File;
-import java.util.List;
 
 @EnableScheduling
 @SpringBootApplication
@@ -25,6 +19,9 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private GmailService gmailService;
 
+	@Autowired
+	private ReadGmailJob job;
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -32,6 +29,11 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
+		try {
+			job.run();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 //		List<Double> imatraPrices = pdfExtractorService.extractAmounts(BillType.IMATRA, "elekter1.pdf");
 //		List<Double> kuTatariPrices = pdfExtractorService.extractAmounts(BillType.KU_TATARI_60, "ku_arve1.pdf");
 //

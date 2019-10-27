@@ -1,8 +1,7 @@
 package com.ruubel.bills.job;
 
+import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.MessagePart;
-import com.google.api.services.gmail.model.MessagePartHeader;
 import com.ruubel.bills.model.Bill;
 import com.ruubel.bills.model.GoogleToken;
 import com.ruubel.bills.model.Property;
@@ -65,32 +64,19 @@ public class ReadGmailJob {
 
                 String out = "";
 
-                List<Message> messages = gmailService.getLast100Messages(googleToken);
+                Gmail gmail = gmailService.createService(googleToken);
+                List<Message> messages = gmailService.getLast100Messages(gmail);
                 List<Property> properties = propertyService.findAllByUser(user);
 
                 for (Message message : messages) {
                     String messageId = message.getId();
                     message = gmailService.getMessage(googleToken, messageId);
-                    MessagePart payload = message.getPayload();
-                    List<MessagePartHeader> headers = payload.getHeaders();
-                    Optional<MessagePartHeader> optionalFromHeader = headers
-                        .stream()
-                        .filter(header -> header.getName().equals("From"))
-                        .findFirst();
-                    if (optionalFromHeader.isPresent()) {
-                        MessagePartHeader fromHeader = optionalFromHeader.get();
-                        String senderEmail = fromHeader.getValue();
-                        for (Property property : properties) {
-                            List<Bill> bills = billService.findAllByProperty(property);
-                            for (Bill bill : bills) {
-                                String targetSenderEmail = bill.getSenderEmail();
-                                if (senderEmail.contains(targetSenderEmail)) {
-                                    log.info("Found email from sender: {}", targetSenderEmail);
-                                    BillType billType = bill.getBillType();
-                                    Double toPay = gmailService.getToPay(messageId, payload, billType, gmailService.createService(googleToken));
-                                    out += String.format("|%s = %s", billType, toPay);
-                                }
-                            }
+                    for (Property property : properties) {
+                        List<Bill> bills = billService.findAllByProperty(property);
+                        for (Bill bill : bills) {
+                            BillType billType = bill.getBillType();
+                            Double toPay = billType.getToPay(bill, message, gmail);
+                            out += String.format("|%s = %s", billType, toPay);
                         }
                     }
                 }
