@@ -7,7 +7,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.*;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
 import com.ruubel.bills.model.GoogleToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +31,9 @@ public class GmailService {
     @Value("${google.app.client.secret}")
     private String CLIENT_SECRET;
 
-    private PDFExtractorService pdfExtractorService;
 
     @Autowired
-    public GmailService(PDFExtractorService pdfExtractorService) throws Exception {
-        this.pdfExtractorService = pdfExtractorService;
+    public GmailService() throws Exception {
         this.JSON_FACTORY = JacksonFactory.getDefaultInstance();
         this.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     }
@@ -71,21 +70,4 @@ public class GmailService {
         ListMessagesResponse messagesResponse = service.users().messages().list(USER).execute();
         return messagesResponse.getMessages();
     }
-
-//    public Double getToPay(String messageId, MessagePart payload, BillType billType, Gmail service) throws Exception {
-//        List<MessagePart> parts = payload.getParts();
-//        Double out = null;
-//        for (MessagePart part : parts) {
-//            String filename = part.getFilename().trim();
-//            if (!filename.isEmpty()) {
-//                MessagePartBody body = part.getBody();
-//                String attachmentId = body.getAttachmentId();
-//                body = service.users().messages().attachments().get(USER, messageId, attachmentId).execute();
-//                byte[] bytes = body.decodeData();
-//                List<Double> prices = pdfExtractorService.extractAmounts(billType, bytes);
-//                out = billType.getBillMath().doTheMath(prices);
-//            }
-//        }
-//        return out;
-//    }
 }

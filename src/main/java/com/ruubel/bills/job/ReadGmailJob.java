@@ -76,7 +76,9 @@ public class ReadGmailJob {
                         for (Bill bill : bills) {
                             BillType billType = bill.getBillType();
                             Double toPay = billType.getToPay(bill, message, gmail);
-                            out += String.format("|%s = %s", billType, toPay);
+                            if (toPay != null) {
+                                out += String.format("|%s = %s", billType, toPay);
+                            }
                         }
                     }
                 }
