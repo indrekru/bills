@@ -25,6 +25,9 @@ import static com.ruubel.bills.service.billstrategy.Tatari60BillStrategy.SECOND_
 public class DevParser {
 
     public DevParser() {
+    }
+
+    public void run() {
         System.out.println("Eesti energia:");
         testEestiEnergia();
         System.out.println("Tatari 60:");
@@ -136,7 +139,8 @@ public class DevParser {
     }
 
     public static void main(String[] args) {
-        new DevParser();
+        DevParser parser = new DevParser();
+        parser.run();
     }
 
 }

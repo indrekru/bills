@@ -1,5 +1,6 @@
 package com.ruubel.bills;
 
+import com.ruubel.bills.job.DevParser;
 import com.ruubel.bills.job.ReadGmailJob;
 import com.ruubel.bills.service.GmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,14 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		try {
-			job.run();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			job.run();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+
+		DevParser devParser = new DevParser();
+		devParser.run();
 
 //		List<Double> imatraPrices = pdfExtractorService.extractAmounts(BillType.IMATRA, "elekter1.pdf");
 //		List<Double> kuTatariPrices = pdfExtractorService.extractAmounts(BillType.KU_TATARI_60, "ku_arve1.pdf");
