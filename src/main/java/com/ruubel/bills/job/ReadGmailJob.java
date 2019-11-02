@@ -95,8 +95,6 @@ public class ReadGmailJob {
                     }
                 }
 
-                System.out.println(emailMessageMap);
-
                 for (Property property : properties) {
 
                     Double totalToPay = 0.0;
