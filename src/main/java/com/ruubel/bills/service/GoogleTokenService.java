@@ -91,6 +91,14 @@ public class GoogleTokenService {
         return null;
     }
 
+    public GoogleToken refreshTokenAndUpdateDB(GoogleToken googleToken) {
+        googleToken = refreshToken(googleToken);
+        if (googleToken != null) {
+            return save(googleToken);
+        }
+        return null;
+    }
+
     public GoogleToken refreshToken(GoogleToken googleToken) {
         Optional<HttpEntity> httpEntity = httpService.post("https://oauth2.googleapis.com/token", new HashMap<String, String>() {{
             put("refresh_token", googleToken.getRefreshToken());
@@ -109,7 +117,7 @@ public class GoogleTokenService {
                 }
                 long expiresIn = json.optLong("expires_in");
                 googleToken.updateAccessToken(accessToken, expiresIn);
-                return save(googleToken);
+                return googleToken;
             } catch (Exception e) {
                 log.error("Failed refreshing token", e);
                 return null;
@@ -127,7 +135,7 @@ public class GoogleTokenService {
             return null;
         }
         if (token.isExpired()) {
-            return refreshToken(token);
+            return refreshTokenAndUpdateDB(token);
         }
         return token;
     }

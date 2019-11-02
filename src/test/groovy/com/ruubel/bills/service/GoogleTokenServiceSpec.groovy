@@ -67,7 +67,7 @@ class GoogleTokenServiceSpec extends Specification {
         given:
             GoogleToken token = new GoogleToken()
         when:
-            GoogleToken updatedToken = service.refreshToken(token)
+            GoogleToken updatedToken = service.refreshTokenAndUpdateDB(token)
         then:
             1 * httpService.post(_, _) >> Optional.empty()
             0 * repository.save(_)
@@ -80,7 +80,7 @@ class GoogleTokenServiceSpec extends Specification {
             entity.content = new ByteArrayInputStream("{}".getBytes())
             GoogleToken token = new GoogleToken()
         when:
-            GoogleToken updatedToken = service.refreshToken(token)
+            GoogleToken updatedToken = service.refreshTokenAndUpdateDB(token)
         then:
             1 * httpService.post(_, _) >> Optional.of(entity)
             0 * repository.save(_)
@@ -93,7 +93,7 @@ class GoogleTokenServiceSpec extends Specification {
             entity.content = new ByteArrayInputStream("{\"access_token\" : \"token\"}".getBytes())
             GoogleToken token = new GoogleToken()
         when:
-            service.refreshToken(token)
+            service.refreshTokenAndUpdateDB(token)
         then:
             1 * httpService.post(_, _) >> Optional.of(entity)
             1 * repository.save(_)
