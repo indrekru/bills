@@ -62,8 +62,7 @@ public class ReadGmailJob {
             if (googleToken != null) {
                 log.info("Fetching mail..");
 
-                String out = "<h1>Bills</h1>";
-                Double totalToPay = 0.0;
+                String out = "Bills | ";
 
                 Gmail gmail = gmailService.createService(googleToken);
                 List<Message> messages = gmailService.getLast100Messages(gmail);
@@ -73,19 +72,18 @@ public class ReadGmailJob {
                     String messageId = message.getId();
                     message = gmailService.getMessage(googleToken, messageId);
                     for (Property property : properties) {
+                        Double totalToPay = 0.0;
                         List<Bill> bills = billService.findAllByProperty(property);
                         for (Bill bill : bills) {
                             BillType billType = bill.getBillType();
                             Double toPay = billType.getToPay(bill, message, gmail);
                             if (toPay != null) {
                                 totalToPay += toPay;
-                                out += String.format("<p>%s: %s</p>", billType, toPay);
                             }
                         }
+                        out += String.format("%s: %s | ", property.getName(), totalToPay);
                     }
                 }
-                out += "<p>-----------------</p>";
-                out += "<h2>Total: " + totalToPay + "</h2>";
                 mailingService.notifyMailRead(out);
             } else {
                 log.error("Couldn't get a valid google token, investigate...");
