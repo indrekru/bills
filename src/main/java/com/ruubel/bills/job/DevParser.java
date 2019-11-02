@@ -32,7 +32,7 @@ public class DevParser {
         testEestiEnergia();
         System.out.println("Tatari 60:");
         testTatari60();
-        System.out.println("Paldiski 75");
+        System.out.println("Paldiski 75:");
         testPaldiski75();
     }
 
