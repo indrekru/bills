@@ -29,7 +29,7 @@ public class Tatari60BillStrategy implements BillStrategy {
         if (optionalFromHeader.isPresent()) {
             MessagePartHeader fromHeader = optionalFromHeader.get();
             String senderEmail = fromHeader.getValue();
-            String targetSenderEmail = bill.getSenderEmail();
+            String targetSenderEmail = (String) bill.getParameter(SENDER_EMAIL);
             if (senderEmail.contains(targetSenderEmail)) {
                 Double toPay = getToPay(message.getId(), payload, gmail);
                 return toPay;

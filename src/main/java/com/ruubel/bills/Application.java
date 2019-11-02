@@ -26,11 +26,12 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		try {
-			job.run();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			job.run();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+
 //		List<Double> imatraPrices = pdfExtractorService.extractAmounts(BillType.IMATRA, "elekter1.pdf");
 //		List<Double> kuTatariPrices = pdfExtractorService.extractAmounts(BillType.KU_TATARI_60, "ku_arve1.pdf");
 //

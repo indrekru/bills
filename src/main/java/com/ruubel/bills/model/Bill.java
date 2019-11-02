@@ -2,13 +2,21 @@ package com.ruubel.bills.model;
 
 import com.ruubel.bills.converter.TimestampConverter;
 import com.ruubel.bills.service.BillType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Map;
 
 @Entity
 @Table(name = "bill")
+@TypeDefs({
+    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+})
 public class Bill implements Serializable {
 
     @Id
@@ -19,8 +27,9 @@ public class Bill implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "sender_email")
-    private String senderEmail;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> parameters;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "bill_type")
@@ -37,11 +46,11 @@ public class Bill implements Serializable {
     public Bill() {
     }
 
-    public Bill(String name, String senderEmail, BillType billType, Property property) {
+    public Bill(String name, BillType billType, Property property, Map<String, Object> parameters) {
         this.name = name;
-        this.senderEmail = senderEmail;
         this.billType = billType;
         this.property = property;
+        this.parameters = parameters;
         this.createdAt = Instant.now();
     }
 
@@ -51,10 +60,6 @@ public class Bill implements Serializable {
 
     public String getName() {
         return name;
-    }
-
-    public String getSenderEmail() {
-        return senderEmail;
     }
 
     public BillType getBillType() {
@@ -67,5 +72,12 @@ public class Bill implements Serializable {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public Object getParameter(String key) {
+        if (parameters != null && parameters.containsKey(key)) {
+            return parameters.get(key);
+        }
+        return null;
     }
 }
