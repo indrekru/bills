@@ -105,6 +105,13 @@
 			<version>4.1.1</version>
 		</dependency>
 
+		<!-- OCR -->
+		<dependency>
+			<groupId>net.sourceforge.tess4j</groupId>
+			<artifactId>tess4j</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+
 		<!-- Google API -->
         <dependency>
             <groupId>com.google.apis</groupId>
