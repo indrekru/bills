@@ -70,10 +70,6 @@ public class Bill implements Serializable {
         return property;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
     public Object getParameter(String key) {
         if (parameters != null && parameters.containsKey(key)) {
             return parameters.get(key);
