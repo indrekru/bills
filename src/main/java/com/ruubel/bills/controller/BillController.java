@@ -34,7 +34,7 @@ public class BillController {
 
     @GetMapping
     public ResponseEntity userBills(Principal principal) {
-        List<Map<String, Object>> out = new ArrayList<>();
+        Map<String, List<Map<String, Object>>> out = new HashMap<>();
         Optional<UserDetails> maybeUser = userService.findByEmail(principal.getName());
         if(maybeUser.isPresent()) {
             User user = (User) maybeUser.get();
@@ -42,21 +42,24 @@ public class BillController {
             List<Property> properties = propertyService.findAllByUser(user);
 
             for (Property property : properties) {
+                List<Map<String, Object>> billsOut = new ArrayList<>();
                 List<Bill> bills = billService.findAllByProperty(property);
                 for (Bill bill : bills) {
                     Optional<BillInstance> maybeBillInstance = billService.findTopByBillAndPaidAndOrderByCreatedAtDesc(bill, false);
                     if (maybeBillInstance.isPresent()) {
                         BillInstance billInstance = maybeBillInstance.get();
-                        out.add(
+                        billsOut.add(
                             new HashMap<String, Object>(){{
-                                put("property", property.getName());
                                 put("bill_name", bill.getName());
                                 put("price", billInstance.getPrice());
+                                put("is_paid", billInstance.isPaid());
+                                put("paid_at", billInstance.getPaidAt());
                                 put("created_at", billInstance.getCreatedAt());
                             }}
                         );
                     }
                 }
+                out.put(property.getName(), billsOut);
             }
         }
         return ResponseEntity.ok(out);
