@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BillService {
@@ -26,11 +27,15 @@ public class BillService {
         return billRepository.findAllByProperty(property);
     }
 
-    public BillInstance findOneByExternalId(String externalId) {
+    public Optional<BillInstance> findOneByExternalId(String externalId) {
         return billInstanceRepository.findOneByExternalId(externalId);
     }
 
     public BillInstance saveBillInstance(BillInstance billInstance) {
         return billInstanceRepository.save(billInstance);
+    }
+
+    public Optional<BillInstance> findTopByBillAndPaidAndOrderByCreatedAtDesc(Bill bill, boolean paid) {
+        return billInstanceRepository.findTopByBillAndPaidOrderByCreatedAtDesc(bill, paid);
     }
 }

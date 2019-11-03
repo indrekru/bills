@@ -51,4 +51,28 @@ public class BillInstance {
     public Double getPrice() {
         return price;
     }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public Bill getBill() {
+        return bill;
+    }
+
+    public Instant getPaidAt() {
+        return paidAt;
+    }
 }
