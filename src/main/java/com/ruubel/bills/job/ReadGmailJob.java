@@ -109,17 +109,18 @@ public class ReadGmailJob {
                             Message message = messageIterator.next();
 
                             String messageId = message.getId();
-                            BillInstance billInstance = billService.findOneByExternalId(messageId);
-                            if (billInstance == null) {
+                            Optional<BillInstance> maybeBillInstance = billService.findOneByExternalId(messageId);
+                            if (!maybeBillInstance.isPresent()) {
                                 Double toPay = billType.getToPay(bill, message, gmail);
                                 if (toPay != null) {
                                     log.info("Saving new BillInstance for: '{}', price: {}", bill.getName(), toPay);
-                                    billInstance = new BillInstance(toPay, messageId, bill);
+                                    BillInstance billInstance = new BillInstance(toPay, messageId, bill);
                                     billService.saveBillInstance(billInstance);
                                     totalToPay += billInstance.getPrice();
                                     messageIterator.remove();
                                 }
                             } else {
+                                BillInstance billInstance = maybeBillInstance.get();
                                 log.info("Found BillInstance for : '{}', price: {}", bill.getName(), billInstance.getPrice());
                                 totalToPay += billInstance.getPrice();
                                 messageIterator.remove();
