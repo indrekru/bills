@@ -4,10 +4,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartHeader;
-import com.ruubel.bills.model.Bill;
-import com.ruubel.bills.model.GoogleToken;
-import com.ruubel.bills.model.Property;
-import com.ruubel.bills.model.User;
+import com.ruubel.bills.model.*;
 import com.ruubel.bills.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,9 +105,19 @@ public class ReadGmailJob {
                             continue;
                         }
                         for (Message message : emailMessages) {
-                            Double toPay = billType.getToPay(bill, message, gmail);
-                            if (toPay != null) {
-                                totalToPay += toPay;
+                            String messageId = message.getId();
+                            BillInstance billInstance = billService.findOneByExternalId(messageId);
+                            if (billInstance == null) {
+                                Double toPay = billType.getToPay(bill, message, gmail);
+                                if (toPay != null) {
+                                    log.info("Saving new BillInstance for: '{}', price: {}", bill.getName(), toPay);
+                                    billInstance = new BillInstance(toPay, messageId, bill);
+                                    billService.saveBillInstance(billInstance);
+                                    totalToPay += billInstance.getPrice();
+                                }
+                            } else {
+                                log.info("Found BillInstance for : '{}', price: {}", bill.getName(), billInstance.getPrice());
+                                totalToPay += billInstance.getPrice();
                             }
                         }
                     }

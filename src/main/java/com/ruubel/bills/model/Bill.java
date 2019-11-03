@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDefs;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -34,6 +35,9 @@ public class Bill implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "bill_type")
     private BillType billType;
+
+    @OneToMany(mappedBy = "bill")
+    private List<BillInstance> billInstances;
 
     @ManyToOne
     @JoinColumn(name = "property")
