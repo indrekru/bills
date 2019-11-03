@@ -104,7 +104,10 @@ public class ReadGmailJob {
                             System.out.println("No entries found for email: " + email);
                             continue;
                         }
-                        for (Message message : emailMessages) {
+                        Iterator<Message> messageIterator = emailMessages.iterator();
+                        while(messageIterator.hasNext()) {
+                            Message message = messageIterator.next();
+
                             String messageId = message.getId();
                             BillInstance billInstance = billService.findOneByExternalId(messageId);
                             if (billInstance == null) {
@@ -114,10 +117,12 @@ public class ReadGmailJob {
                                     billInstance = new BillInstance(toPay, messageId, bill);
                                     billService.saveBillInstance(billInstance);
                                     totalToPay += billInstance.getPrice();
+                                    messageIterator.remove();
                                 }
                             } else {
                                 log.info("Found BillInstance for : '{}', price: {}", bill.getName(), billInstance.getPrice());
                                 totalToPay += billInstance.getPrice();
+                                messageIterator.remove();
                             }
                         }
                     }
