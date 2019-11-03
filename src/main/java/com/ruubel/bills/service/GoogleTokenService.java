@@ -67,7 +67,7 @@ public class GoogleTokenService {
                 long expiresIn = json.optLong("expires_in");
                 String scope = json.optString("scope", null);
 
-                GoogleToken googleToken = findTopByOrderByUpdatedAtDesc();
+                GoogleToken googleToken = findByUser(user);
                 if (googleToken == null) {
                     googleToken = new GoogleToken(
                         accessToken,

@@ -26,6 +26,8 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/v1/google/connect").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/google/callback").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/seb/connect").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/seb/callback").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
                 .anyRequest().authenticated()
         ;
