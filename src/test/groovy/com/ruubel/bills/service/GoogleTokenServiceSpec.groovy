@@ -31,7 +31,7 @@ class GoogleTokenServiceSpec extends Specification {
             GoogleToken token = service.getAccessToken(user, "code")
         then:
             1 * httpService.post(_, _) >> Optional.empty()
-            0 * repository.findTopByOrderByUpdatedAtDesc()
+            0 * repository.findByUser(_)
             0 * repository.save(_)
             token == null
     }
@@ -45,7 +45,7 @@ class GoogleTokenServiceSpec extends Specification {
             GoogleToken token = service.getAccessToken(user, "code")
         then:
             1 * httpService.post(_, _) >> Optional.of(entity)
-            0 * repository.findTopByOrderByUpdatedAtDesc()
+            0 * repository.findByUser(_)
             0 * repository.save(_)
             token == null
     }
@@ -59,7 +59,7 @@ class GoogleTokenServiceSpec extends Specification {
             service.getAccessToken(user, "code")
         then:
             1 * httpService.post(_, _) >> Optional.of(entity)
-            1 * repository.findTopByOrderByUpdatedAtDesc() >> null
+            1 * repository.findByUser(_) >> null
             1 * repository.save(_)
     }
 
