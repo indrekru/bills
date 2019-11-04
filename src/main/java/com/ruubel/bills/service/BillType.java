@@ -3,16 +3,14 @@ package com.ruubel.bills.service;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.ruubel.bills.model.Bill;
-import com.ruubel.bills.service.billstrategy.BillStrategy;
-import com.ruubel.bills.service.billstrategy.EestiEnergiaBillStrategy;
-import com.ruubel.bills.service.billstrategy.PeterburiTee28BillStrategy;
-import com.ruubel.bills.service.billstrategy.Tatari60BillStrategy;
+import com.ruubel.bills.service.billstrategy.*;
 
 public enum BillType {
 
     KU_TATARI_60(new Tatari60BillStrategy()),
     EESTI_ENERGIA(new EestiEnergiaBillStrategy()),
-    KU_PETERBURI_TEE_28(new PeterburiTee28BillStrategy());
+    KU_PETERBURI_TEE_28(new PeterburiTee28BillStrategy()),
+    ELISA(new ElisaBillStartegy());
 
     private BillStrategy strategy;
 
