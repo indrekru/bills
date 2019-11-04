@@ -1,9 +1,6 @@
 package com.ruubel.bills.job;
 
-import com.ruubel.bills.service.billstrategy.BillStrategy;
-import com.ruubel.bills.service.billstrategy.EestiEnergiaBillStrategy;
-import com.ruubel.bills.service.billstrategy.PeterburiTee28BillStrategy;
-import com.ruubel.bills.service.billstrategy.Tatari60BillStrategy;
+import com.ruubel.bills.service.billstrategy.*;
 import net.sourceforge.tess4j.Tesseract;
 import org.json.JSONObject;
 import org.springframework.util.ResourceUtils;
@@ -28,14 +25,33 @@ public class DevParser {
     }
 
     public void run() {
-        System.out.println("Eesti energia:");
-        testEestiEnergia();
-        System.out.println("Tatari 60:");
-        testTatari60();
+//        System.out.println("Eesti energia:");
+//        testEestiEnergia();
+//        System.out.println("Tatari 60:");
+//        testTatari60();
 //        System.out.println("Paldiski 75:");
 //        testPaldiski75();
-        System.out.println("Peterburi tee 28:");
-        testPeterburiTee28();
+//        System.out.println("Peterburi tee 28:");
+//        testPeterburiTee28();
+//        System.out.println("Elisa bill:");
+//        testElisa();
+    }
+
+    private void testElisa() {
+
+        BillStrategy strategy = new ElisaBillStartegy();
+
+        Map<String, Object> params = new HashMap<String, Object>(){{
+            put(SENDER_EMAIL, "noreply.arved@elisa.ee");
+            put(EXTRACTION, new HashMap<String, String>(){{
+                put(FIRST_LINE, "Kokku käesoleva");
+            }});
+        }};
+
+//        JSONObject jsonObject = new JSONObject(params);
+//        System.out.println(jsonObject);
+
+        extractPrice(strategy, (Map<String, String>) params.get(EXTRACTION), "bills/elisa.pdf");
     }
 
     private void testPaldiski75() {
