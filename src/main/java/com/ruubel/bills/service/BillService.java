@@ -3,6 +3,7 @@ package com.ruubel.bills.service;
 import com.ruubel.bills.model.Bill;
 import com.ruubel.bills.model.BillInstance;
 import com.ruubel.bills.model.Property;
+import com.ruubel.bills.model.User;
 import com.ruubel.bills.repository.BillInstanceRepository;
 import com.ruubel.bills.repository.BillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,9 @@ public class BillService {
 
     public Optional<BillInstance> findTopByBillAndPaidAndOrderByCreatedAtDesc(Bill bill, boolean paid) {
         return billInstanceRepository.findTopByBillAndPaidOrderByCreatedAtDesc(bill, paid);
+    }
+
+    public List<BillInstance> findAllByPaidAndBillPropertyUser(boolean paid, User user) {
+        return billInstanceRepository.findAllByPaidAndBillPropertyUser(paid, user);
     }
 }

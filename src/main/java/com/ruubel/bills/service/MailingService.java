@@ -27,8 +27,8 @@ public class MailingService {
 
     public MailingService() {}
 
-    public void notifyMailRead(String content) {
-        send("Read-mail results", content);
+    public void notifyUnpaidBills(String content) {
+        send("Unpaid bills", content);
     }
 
     public void notifyMailReadFail() {
