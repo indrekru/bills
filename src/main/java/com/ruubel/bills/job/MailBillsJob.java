@@ -58,6 +58,7 @@ public class MailBillsJob {
                     billInstances = propertyBills.get(property);
                 }
                 billInstances.add(unpaidBill);
+                propertyBills.put(property, billInstances);
             }
             log.info("Done mapping to properties, map size: {}", propertyBills.size());
 
