@@ -1,6 +1,6 @@
 package com.ruubel.bills;
 
-import com.ruubel.bills.job.DevParser;
+import com.ruubel.bills.job.MailBillsJob;
 import com.ruubel.bills.job.ReadGmailJob;
 import com.ruubel.bills.service.GmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,10 @@ public class Application implements CommandLineRunner {
 	private GmailService gmailService;
 
 	@Autowired
-	private ReadGmailJob job;
+	private ReadGmailJob readGmailJob;
+
+	@Autowired
+	private MailBillsJob mailBillsJob;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -28,7 +31,8 @@ public class Application implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		try {
-			job.run();
+			readGmailJob.run();
+			mailBillsJob.run();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

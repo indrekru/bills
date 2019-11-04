@@ -48,7 +48,7 @@ public class ReadGmailJob {
     }
 
 //    @Scheduled(cron = "0 0/5 * * * ?") // Every 5 minutes
-    @Scheduled(cron = "0 0 0/12 * * ?") // Every 12 hours
+    @Scheduled(cron = "0 0 0/1 * * ?") // Every 1 hours
     public void run() throws Exception {
 
         log.info("Running mail-read job");
@@ -60,8 +60,6 @@ public class ReadGmailJob {
             GoogleToken googleToken = googleTokenService.getValidToken(user);
             if (googleToken != null) {
                 log.info("Fetching mail..");
-
-                String out = "Bills | ";
 
                 Gmail gmail = gmailService.createService(googleToken);
                 List<Message> messages = gmailService.getLast100Messages(gmail);
@@ -93,8 +91,6 @@ public class ReadGmailJob {
                 }
 
                 for (Property property : properties) {
-
-                    Double totalToPay = 0.0;
                     List<Bill> bills = billService.findAllByProperty(property);
                     for (Bill bill : bills) {
                         String email = (String) bill.getParameter(SENDER_EMAIL);
@@ -116,21 +112,16 @@ public class ReadGmailJob {
                                     log.info("Saving new BillInstance for: '{}', price: {}", bill.getName(), toPay);
                                     BillInstance billInstance = new BillInstance(toPay, messageId, bill);
                                     billService.saveBillInstance(billInstance);
-                                    totalToPay += billInstance.getPrice();
                                     messageIterator.remove();
                                 }
                             } else {
                                 BillInstance billInstance = maybeBillInstance.get();
                                 log.info("Found BillInstance for : '{}', price: {}", bill.getName(), billInstance.getPrice());
-                                totalToPay += billInstance.getPrice();
                                 messageIterator.remove();
                             }
                         }
                     }
-                    out += String.format("%s: %s | ", property.getName(), totalToPay);
                 }
-
-                mailingService.notifyMailRead(out);
             } else {
                 log.error("Couldn't get a valid google token, investigate...");
             }
