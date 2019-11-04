@@ -46,8 +46,9 @@ public class MailBillsJob {
         for (User user : users) {
             Map<String, Object> out = new HashMap<>();
             List<BillInstance> unpaidBills =  billService.findAllByPaidAndBillPropertyUser(false, user);
-            Map<Property, List<BillInstance>> propertyBills = new HashMap<>();
+            log.info("Found {} unpaid bills, sorting them...", unpaidBills.size());
 
+            Map<Property, List<BillInstance>> propertyBills = new HashMap<>();
             // map to properties
             for (BillInstance unpaidBill : unpaidBills) {
                 Bill bill = unpaidBill.getBill();
@@ -58,13 +59,16 @@ public class MailBillsJob {
                 }
                 billInstances.add(unpaidBill);
             }
+            log.info("Done mapping to properties, map size: {}", propertyBills.size());
 
             // Create the JSON
             for (Map.Entry<Property, List<BillInstance>> entry : propertyBills.entrySet()) {
                 Property property = entry.getKey();
+                log.info("Doing property: {}" + property.getName());
                 List<BillInstance> bills = entry.getValue();
                 List<Map<String, Object>> billsOut = new ArrayList<>();
                 for (BillInstance billInstance : bills) {
+                    log.info("Doing bill price: {}", billInstance.getPrice());
                     Bill bill = billInstance.getBill();
                     billsOut.add(new HashMap<String, Object>(){{
                         put("price", billInstance.getPrice());
@@ -76,6 +80,8 @@ public class MailBillsJob {
                 String propertyName = property.getName();
                 out.put(propertyName, billsOut);
             }
+
+            log.info("Created map size: {}", out.size());
 
             JSONObject jsonObject = new JSONObject(out);
             mailingService.notifyUnpaidBills(jsonObject.toString());
