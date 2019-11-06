@@ -36,7 +36,7 @@ public class MailBillsJob {
     }
 
 //    @Scheduled(cron = "0 0/5 * * * ?") // Every 5 minutes
-    @Scheduled(cron = "0 0 0/6 * * ?") // Every 6 hours
+    @Scheduled(cron = "0 0 0/12 * * ?") // Every 6 hours
     public void run() throws Exception {
 
         log.info("Sending unpaid bill emails");

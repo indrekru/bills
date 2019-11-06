@@ -48,7 +48,7 @@ public class ReadGmailJob {
     }
 
 //    @Scheduled(cron = "0 0/5 * * * ?") // Every 5 minutes
-    @Scheduled(cron = "0 0 0/1 * * ?") // Every 1 hours
+    @Scheduled(cron = "0 0 0/3 * * ?") // Every 1 hours
     public void run() throws Exception {
 
         log.info("Running mail-read job");
