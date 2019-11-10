@@ -82,7 +82,10 @@ public class MailBillsJob {
                 .mapToInt(list -> list.size())
                 .sum();
 
+            log.info("Found {} unpaid bills", sum);
+
             if (sum > 0) {
+                log.info("Notifying unpaid bills");
                 JSONObject jsonObject = new JSONObject(out);
                 mailingService.notifyUnpaidBills(jsonObject.toString());
             }
