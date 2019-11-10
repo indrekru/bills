@@ -44,7 +44,7 @@ public class MailBillsJob {
         List<User> users = userService.findAllByActive(true);
 
         for (User user : users) {
-            Map<String, Object> out = new HashMap<>();
+            Map<String, List<Map<String, Object>>> out = new HashMap<>();
             List<BillInstance> unpaidBills =  billService.findAllByPaidAndBillPropertyUser(false, user);
 
             Map<Property, List<BillInstance>> propertyBills = new HashMap<>();
@@ -78,10 +78,36 @@ public class MailBillsJob {
                 out.put(propertyName, billsOut);
             }
 
-            JSONObject jsonObject = new JSONObject(out);
-            mailingService.notifyUnpaidBills(jsonObject.toString());
+            int sum = out.values().stream()
+                .mapToInt(list -> list.size())
+                .sum();
+
+            if (sum > 0) {
+                JSONObject jsonObject = new JSONObject(out);
+                mailingService.notifyUnpaidBills(jsonObject.toString());
+            }
         }
         log.info("Done sending emails");
+    }
+
+
+    public static void main(String[] args) {
+
+        Map<String, List<String>> map = new HashMap<String, List<String>>(){{
+            put("one", new ArrayList<String>(){{
+                add("#");
+            }});
+            put("two", new ArrayList<String>(){{
+                add("fdssg");
+            }});
+        }};
+
+        long count = map.values().stream()
+                .mapToInt(list -> list.size())
+                .sum();
+
+        System.out.println(count);
+
     }
 
 }
